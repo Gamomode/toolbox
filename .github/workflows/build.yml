@@ -9,14 +9,13 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-      - name: Accept licenses
-        run: yes | sdkmanager --licenses >/dev/null || true
+      - uses: android-actions/setup-android@v3
       - name: Build APK
         run: |
-          unzip -o "工具箱原生版.zip"
+          ZIP=$(find . -maxdepth 2 -name "*.zip" | head -1)
+          if [ -z "$ZIP" ]; then echo "仓库里没有找到 zip 压缩包，请把工程压缩包上传到仓库"; exit 1; fi
+          echo "使用压缩包：$ZIP"
+          unzip -o "$ZIP"
           cd ToolboxNative
           gradle assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
